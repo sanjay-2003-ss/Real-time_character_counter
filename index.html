@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Character Counter with Progress Bar</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 30px;
+    }
+    textarea {
+      width: 100%;
+      height: 140px;
+      padding: 10px;
+      font-size: x-large;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      resize: none;
+    }
+    #counter {
+      margin-top: 8px;
+      font-size: 16px;
+      color: #555;
+      transition: color 0.3s ease;
+    }
+    #warning {
+      color: red;
+      font-size: 15px;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      display: inline-block;
+    }
+    #warning.show {
+      opacity: 1;
+    }
+    .progress-container {
+      width: 100%;
+      height: 8px;
+      background: #eee;
+      border-radius: 5px;
+      margin-top: 10px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: green;
+      transition: width 0.3s ease, background 0.3s ease;
+    }
+
+    /* Pulse animation for progress bar */
+    @keyframes pulse {
+      0% { transform: scaleX(1); opacity: 1; }
+      50% { transform: scaleX(1.05); opacity: 0.7; }
+      100% { transform: scaleX(1); opacity: 1; }
+    }
+    .pulse {
+      animation: pulse 1s infinite;
+    }
+
+    /* Shake animation for warning */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      75% { transform: translateX(-5px); }
+    }
+    .shake {
+      animation: shake 0.4s ease;
+    }
+
+    /* Clear button styling */
+    #clearBtn {
+      margin-top: 15px;
+      padding: 8px 16px;
+      font-size: 14px;
+      border: none;
+      border-radius: 6px;
+      background: #007bff;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    #clearBtn:hover {
+      background: #0056b3;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Message Box (200 characters max)</h2>
+  <textarea id="message" maxlength="200" placeholder="Type your message..."></textarea>
+  <div id="counter">0/200 characters (200 remaining)</div>
+  <div class="progress-container">
+    <div class="progress-bar" id="progress"></div>
+  </div>
+  <div id="warning">⚠️ You have reached the character limit!</div>
+  <br>
+  <button id="clearBtn">Clear Message</button>
+
+  <script>
+    const textarea = document.getElementById("message");
+    const counter = document.getElementById("counter");
+    const warning = document.getElementById("warning");
+    const progress = document.getElementById("progress");
+    const clearBtn = document.getElementById("clearBtn");
+    const maxChars = 200;
+
+    function updateCounter() {
+      let currentLength = textarea.value.length;
+      let remaining = maxChars - currentLength;
+
+      // Update counter
+      counter.textContent = `${currentLength}/${maxChars} characters (${remaining} remaining)`;
+
+      // Update progress bar width
+      let percent = (currentLength / maxChars) * 100;
+      progress.style.width = percent + "%";
+
+      // Change colors based on progress
+      if (currentLength >= 180 && currentLength < maxChars) {
+        counter.style.color = "orange";
+        progress.style.background = "orange";
+        progress.classList.remove("pulse");
+      } else if (currentLength >= maxChars) {
+        counter.style.color = "red";
+        progress.style.background = "red";
+        progress.classList.add("pulse"); // Pulse progress bar
+
+        // Show warning + add shake animation
+        warning.classList.add("show", "shake");
+        warning.addEventListener("animationend", () => {
+          warning.classList.remove("shake");
+        }, { once: true });
+      } else {
+        counter.style.color = "#555";
+        progress.style.background = "green";
+        progress.classList.remove("pulse");
+        warning.classList.remove("show");
+      }
+    }
+
+    textarea.addEventListener("input", updateCounter);
+
+    // Clear button functionality
+    clearBtn.addEventListener("click", () => {
+      textarea.value = "";
+      progress.style.width = "0%";
+      counter.textContent = `0/${maxChars} characters (${maxChars} remaining)`;
+      counter.style.color = "#555";
+      progress.style.background = "green";
+      progress.classList.remove("pulse");
+      warning.classList.remove("show");
+    });
+  </script>
+
+</body>
+</html>
